@@ -16,7 +16,6 @@ class UserRepo {
     var c = Completer<UserData>();
     try {
       var response = await _userService.signIn(phone, pass);
-      print(response);
       var userData = UserData.fromJson(response.data['data']);
       if (userData != null) {
         SPref.instance.set(SPrefCache.KEY_TOKEN, userData.token);
@@ -25,7 +24,6 @@ class UserRepo {
     } on DioError catch (e) {
       print(e.response.data);
       c.completeError('Đăng nhập thất bại');
-      // c.completeError('Đăng nhập thất bại');
     } catch (e) {
       c.completeError(e);
     }

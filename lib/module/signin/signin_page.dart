@@ -41,20 +41,33 @@ class SignInFormWidget extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _buildPhoneField(),
-              _buildPassField(),
-              NormalButton(onPressed: () {
-                print(_txtPhoneController.text);
-                bloc.event.add(
-                  SignInEvent(
-                    phone: _txtPhoneController.text,
-                    pass: _txtPassController.text,
-                  ),
-                );
-              }),
+              _buildPhoneField(bloc),
+              _buildPassField(bloc),
+              _buildSignInButton(bloc),
               _buildFooter(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton(SignInBloc bloc) {
+    return StreamProvider<bool>.value(
+      initialData: false,
+      value: bloc.btnStream,
+      child: Consumer<bool>(
+        builder: (context, enable, child) => NormalButton(
+          onPressed: enable
+              ? () {
+                  bloc.event.add(
+                    SignInEvent(
+                      phone: _txtPhoneController.text,
+                      pass: _txtPassController.text,
+                    ),
+                  );
+                }
+              : null,
         ),
       ),
     );
@@ -79,46 +92,66 @@ class SignInFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneField() {
-    return Container(
-      margin: EdgeInsets.only(
-        bottom: 15,
-      ),
-      child: TextFormField(
-        controller: _txtPhoneController,
-        cursorColor: Colors.black,
-        keyboardType: TextInputType.phone,
-        decoration: InputDecoration(
-          icon: Icon(
-            Icons.phone,
-            color: AppColor.blue,
+  Widget _buildPhoneField(SignInBloc bloc) {
+    return StreamProvider<String>.value(
+      initialData: null,
+      value: bloc.phoneStream,
+      child: Consumer<String>(
+        builder: (context, msg, child) => Container(
+          margin: EdgeInsets.only(
+            bottom: 15,
           ),
-          hintText: '(+84) 973 901 789',
-          labelText: 'Phone',
-          labelStyle: TextStyle(color: AppColor.blue),
+          child: TextField(
+            controller: _txtPhoneController,
+            onChanged: (text) {
+              bloc.phoneSink.add(text);
+            },
+            cursorColor: Colors.black,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              icon: Icon(
+                Icons.phone,
+                color: AppColor.blue,
+              ),
+              hintText: '0973901737',
+              errorText: msg,
+              labelText: 'Phone',
+              labelStyle: TextStyle(color: AppColor.blue),
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildPassField() {
-    return Container(
-      margin: EdgeInsets.only(
-        bottom: 15,
-      ),
-      child: TextFormField(
-        controller: _txtPassController,
-        obscureText: true,
-        cursorColor: Colors.black,
-        keyboardType: TextInputType.phone,
-        decoration: InputDecoration(
-          icon: Icon(
-            Icons.lock,
-            color: AppColor.blue,
+  Widget _buildPassField(SignInBloc bloc) {
+    return StreamProvider<String>.value(
+      initialData: null,
+      value: bloc.passStream,
+      child: Consumer<String>(
+        builder: (context, msg, child) => Container(
+          margin: EdgeInsets.only(
+            bottom: 15,
           ),
-          hintText: 'Password',
-          labelText: 'Password',
-          labelStyle: TextStyle(color: AppColor.blue),
+          child: TextField(
+            controller: _txtPassController,
+            onChanged: (text) {
+              bloc.passSink.add(text);
+            },
+            obscureText: true,
+            cursorColor: Colors.black,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              icon: Icon(
+                Icons.lock,
+                color: AppColor.blue,
+              ),
+              hintText: '123456',
+              labelText: 'Password',
+              errorText: msg,
+              labelStyle: TextStyle(color: AppColor.blue),
+            ),
+          ),
         ),
       ),
     );

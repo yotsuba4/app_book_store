@@ -28,9 +28,16 @@ class SignInPage extends StatelessWidget {
   }
 }
 
-class SignInFormWidget extends StatelessWidget {
+class SignInFormWidget extends StatefulWidget {
+  @override
+  _SignInFormWidgetState createState() => _SignInFormWidgetState();
+}
+
+class _SignInFormWidgetState extends State<SignInFormWidget> {
   final TextEditingController _txtPhoneController = TextEditingController();
+
   final TextEditingController _txtPassController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Provider<SignInBloc>.value(
@@ -44,7 +51,7 @@ class SignInFormWidget extends StatelessWidget {
               _buildPhoneField(bloc),
               _buildPassField(bloc),
               _buildSignInButton(bloc),
-              _buildFooter(),
+              _buildFooter(context),
             ],
           ),
         ),
@@ -58,6 +65,7 @@ class SignInFormWidget extends StatelessWidget {
       value: bloc.btnStream,
       child: Consumer<bool>(
         builder: (context, enable, child) => NormalButton(
+          title: 'Sign In',
           onPressed: enable
               ? () {
                   bloc.event.add(
@@ -73,10 +81,10 @@ class SignInFormWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print('Da bat su kien');
+        Navigator.pushNamed(context, '/sign-up');
       },
       child: Container(
         margin: EdgeInsets.only(top: 20),

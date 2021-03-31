@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class NormalButton extends StatelessWidget {
   final VoidCallback onPressed;
+  final String title;
 
-  NormalButton({@required this.onPressed});
+  NormalButton({@required this.onPressed,@required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class NormalButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         child: Text(
-          'Sign In',
+          title,
           style: BtnStyle.normal(),
         ),
         style: ElevatedButton.styleFrom(

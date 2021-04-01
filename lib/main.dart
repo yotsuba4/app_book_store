@@ -3,6 +3,8 @@ import 'package:app_book_store/module/signup/signup_page.dart';
 import 'package:app_book_store/shared/app_color.dart';
 import 'package:flutter/material.dart';
 
+import 'module/home/home_page.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
         '/': (context) => SignInPage(),
+        '/home': (context) => HomePage(),
         '/sign-in': (context) => SignInPage(),
         '/sign-up': (context) => SignUpPage(),
       },

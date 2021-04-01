@@ -1,9 +1,14 @@
+import 'package:app_book_store/base/base_event.dart';
 import 'package:app_book_store/base/base_widget.dart';
 import 'package:app_book_store/data/remote/user_service.dart';
 import 'package:app_book_store/data/repo/user_repo.dart';
 import 'package:app_book_store/event/signin_event.dart';
+import 'package:app_book_store/event/signin_fail_event.dart';
+import 'package:app_book_store/event/signin_sucess_event.dart';
 import 'package:app_book_store/module/signin/signin_bloc.dart';
 import 'package:app_book_store/shared/app_color.dart';
+import 'package:app_book_store/shared/widget/bloc_listener.dart';
+import 'package:app_book_store/shared/widget/loading_task.dart';
 import 'package:app_book_store/shared/widget/normal_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,24 +42,46 @@ class _SignInFormWidgetState extends State<SignInFormWidget> {
   final TextEditingController _txtPhoneController = TextEditingController();
 
   final TextEditingController _txtPassController = TextEditingController();
+  handleEvent(BaseEvent event) {
+    if (event is SignInSuccessEvent) {
+      Navigator.pushReplacementNamed(context, '/home');
+      return;
+    }
+
+    if (event is SignInFailEvent) {
+      final snackBar = SnackBar(
+        content: Text(event.errMessage),
+        backgroundColor: Colors.red,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Provider<SignInBloc>.value(
       value: SignInBloc(userRepo: Provider.of(context)),
       child: Consumer<SignInBloc>(
-        builder: (context, bloc, child) => Container(
-          padding: EdgeInsets.all(25),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _buildPhoneField(bloc),
-              _buildPassField(bloc),
-              _buildSignInButton(bloc),
-              _buildFooter(context),
-            ],
-          ),
-        ),
+        builder: (context, bloc, child) {
+          return BlocListener<SignInBloc>(
+            child: LoadingTask(
+              bloc: bloc,
+              child: Container(
+                padding: EdgeInsets.all(25),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _buildPhoneField(bloc),
+                    _buildPassField(bloc),
+                    _buildSignInButton(bloc),
+                    _buildFooter(context),
+                  ],
+                ),
+              ),
+            ),
+            listener: handleEvent,
+          );
+        },
       ),
     );
   }

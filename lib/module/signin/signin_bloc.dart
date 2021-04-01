@@ -4,7 +4,8 @@ import 'package:app_book_store/base/base_bloc.dart';
 import 'package:app_book_store/base/base_event.dart';
 import 'package:app_book_store/data/repo/user_repo.dart';
 import 'package:app_book_store/event/signin_event.dart';
-import 'package:app_book_store/event/signup_event.dart';
+import 'package:app_book_store/event/signin_fail_event.dart';
+import 'package:app_book_store/event/signin_sucess_event.dart';
 import 'package:app_book_store/shared/validation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
@@ -68,25 +69,29 @@ class SignInBloc extends BaseBloc {
       case SignInEvent:
         handleSignIn(event);
         break;
-      case SignUpEvent:
-        handleSignUp(event);
-        break;
     }
   }
 
   handleSignIn(event) {
-    SignInEvent e = event as SignInEvent;
-    _userRepo.signIn(e.phone, e.pass).then(
-      (userData) {
-        print(userData);
-      },
-      onError: (e) {
-        print(e);
-      },
-    );
+    btnSink.add(false); //Khi bắt đầu call api thì disable nút sign-in
+    loadingSink.add(true); // show loading
+
+    Future.delayed(Duration(seconds: 6), () {
+      SignInEvent e = event as SignInEvent;
+      _userRepo.signIn(e.phone, e.pass).then(
+        (userData) {
+          processEventSink.add(SignInSuccessEvent(userData));
+        },
+        onError: (e) {
+          btnSink.add(true); //Khi có kết quả thì enable nút sign-in trở lại
+          loadingSink.add(false); // hide loading
+          processEventSink
+              .add(SignInFailEvent(e.toString())); // thông báo kết quả
+        },
+      );
+    });
   }
 
-  handleSignUp(event) {}
   @override
   void dispose() {
     super.dispose();
